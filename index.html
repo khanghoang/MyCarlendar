@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html lang="en" class="no-js ie6 oldie"> <![endif]-->
+<!--[if IE 7]>    <html lang="en" class="no-js ie7 oldie"> <![endif]-->
+<!--[if IE 8]>    <html lang="en" class="no-js ie8 oldie"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class='no-js' lang='en'>
+  <!--<![endif]-->
+  <head>
+    <meta charset='utf-8' />
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible' />
+    <title></title>
+    <meta content='' name='description' />
+    <meta content='' name='author' />
+    <meta content='width=device-width, initial-scale=1.0' name='viewport' />
+    <link href='stylesheets/style.css' rel='stylesheet' />
+    <script src='javascripts/modernizr-2.0.6.min.js'></script>
+  </head>
+  <body>
+    <div id='container'>
+      <header></header>
+      <div id='main' role='main'>
+        
+        <!-- my code in here -->
+        <input id="inputDate" type="text" value="12/11/1976"></input>
+        <button id="getWeekDay">Get Week Day</button>
+        <div id="result"></div>
+
+      </div>
+      <footer></footer>
+    </div>
+
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'></script>
+    <script>
+      window.jQuery || document.write("<script src='javascripts/jquery-1.6.2.min.js'>\x3C/script>")
+    </script>
+  
+    <script>
+      var Carlendar = (function($){
+
+        daysOfWeek      = ["Monday", "Tuesday", "Wednesday", "Thusday", "Friday", "Saturday", "Sunday"],
+        months    = [
+          { 
+            name          : "Jannuary",
+            daysOfMonth   : 31
+          }, 
+
+          { 
+            name          : "Febuary",
+            daysOfMonth   : 28
+          }, 
+
+          { 
+            name          : "March",
+            daysOfMonth   : 31
+          }, 
+
+          { 
+            name          : "April",
+            daysOfMonth   : 30
+          }, 
+
+          { 
+            name          : "May",
+            daysOfMonth   : 31
+          }, 
+
+          { 
+            name          : "June",
+            daysOfMonth   : 30
+          }, 
+
+          { 
+            name          : "July",
+            daysOfMonth   : 31
+          }, 
+
+          { 
+            name          : "August",
+            daysOfMonth   : 31
+          }, 
+
+          { 
+            name          : "September",
+            daysOfMonth   : 30
+          }, 
+
+          { 
+            name          : "Ortober",
+            daysOfMonth   : 31
+          }, 
+
+          { 
+            name          : "November",
+            daysOfMonth   : 30
+          }, 
+
+          { 
+            name          : "December",
+            daysOfMonth   : 31
+          }
+        ]
+
+        return{
+
+          // Validate 
+          validate: function( dateString ){
+            var arr = dateString.split("/");            
+
+            if (arr.length != 3)
+              return false;
+
+            for (var i = 0; i < arr.length ; i++) {              
+
+              if (!this.isNumeric(arr[i]))                              
+                return false;
+
+            }; 
+
+            var day = parseInt(arr[0]);
+            var month = parseInt(arr[1]);
+            var year = parseInt(arr[2]);
+
+            return true; //&& this.validateDay(day, month, year) && this.validateMonth(month) && this.validateYear(year);
+          },
+
+          validateDay: function(day, month, year)
+          {
+
+            if (this.isLeapYear())
+              months[1].daysOfMonth = 29;
+
+            if (day < 1 || day > months[month - 1].daysOfMonth) 
+            {
+              months[1].daysOfMonth = 28;
+              return false;
+            }
+
+            return true;
+
+          },
+
+          validateMonth: function(month){
+            if (month < 1 || month > 12) 
+              return false;
+            return true;
+          },
+
+          validateYear: function(year){
+            if (year < 1)
+              return false;
+            return true;
+          },
+
+          isNumeric: function(input)
+          {
+            return (input - 0) == input && (input+'').replace(/^\s+|\s+$/g, "").length > 0;
+          },
+
+          // Bind button
+          buttonClick: function(){
+            $("#getWeekDay").click(function(){            
+
+              var date = $("#inputDate").val();
+
+              if (!Carlendar.validate(date))
+                $("#result").text("Wrong format or wrong values");                
+              else
+              {
+                $("#result").text("The weekday of " + date + " is " + Carlendar.weekDayOfDateString(date));
+              }
+            })
+          },          
+
+          // The brain
+          isLeapYear: function( year ){
+            if (year % 400 == 0)
+              return true;            
+
+            if (year % 4 == 0 && year % 100 != 0)  
+              return true;
+
+            return false;
+            
+            // return (new Date( year, 1, 29 ).getMonth() === 1);
+          },
+
+          daysOfYear: function( year ){
+            if (this.isLeapYear(year)) 
+              return 366;
+            return 365;
+          },
+
+          daysFromTheFirstDay: function( day, month, year ){
+
+            var days = 0;
+            var countLeapYear = 0;
+
+            for (var i = 1; i <= year - 1; i++) {
+              if (this.isLeapYear(i))
+                countLeapYear++;
+              days += this.daysOfYear(i);                   
+            };
+
+            console.log("Count of leap years = " + countLeapYear);            
+
+            console.log("Years = " + (year - 1901));
+
+            // Feb has 29 days
+            if (this.isLeapYear(year)){
+              months[1].daysOfMonth = 29;            
+            }            
+
+            for (var i = 1; i <= month - 1; i++) {
+              days += months[i-1].daysOfMonth;              
+            };
+            console.log("Months = " + (month - 1));
+
+            console.log('Days = ' + day);
+
+            //reset
+            months[1].daysOfMonth = 28;            
+
+            console.log('Total Days = ' + (days + day - 1));
+
+            return days + day - 1;
+          },
+
+          weekDayOfDateString: function( stringDate ){
+
+            arr = stringDate.split("/");
+            return this.weekDayOfDate(parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]));
+
+          },
+
+          weekDayOfDate: function( day, month, year ){
+
+            var days = this.daysFromTheFirstDay(day, month, year);
+            return daysOfWeek[days % 7];
+
+          }
+
+        }
+
+      })(jQuery);  
+
+      Carlendar.buttonClick();
+
+    </script>
+    <!--[if lt IE 7]>
+    <script src='//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js'></script>
+    <script>
+      window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})});
+    </script>
+    <![endif]-->
+  </body>
+</html>
